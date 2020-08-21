@@ -5,7 +5,7 @@ namespace Domain.UseCases.CountriesSearch
 {
     public abstract class SearchCountryUseCase
     {
-        public abstract IEnumerable<CountrySearchOutput> Execute(string name);
+        public abstract IEnumerable<CountrySearchOutput> Execute(string input);
         
         protected IEnumerable<CountrySearchOutput> CreateCountriesSearchOutputs(IEnumerable<Country> countries)
         {
