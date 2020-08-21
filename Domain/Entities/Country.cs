@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Entities
 {
@@ -14,5 +15,22 @@ namespace Domain.Entities
         public List<RegionalBloc> RegionalBlocs { get; set; }
         public List<Currency> Currencies { get; set; }
         public List<Language> Languages { get; set; }
+
+
+        public IEnumerable<string> GetCurrenciesCodes()
+        {
+            if (Currencies == null)
+                return new List<string>();
+
+            return Currencies.Select(c => c.Code);
+        }
+
+        public IEnumerable<string> GetRegionalBlocsNames()
+        {
+            if (RegionalBlocs == null)
+                return new List<string>();
+
+            return RegionalBlocs.Select(c => c.Name);
+        }
     } 
 }

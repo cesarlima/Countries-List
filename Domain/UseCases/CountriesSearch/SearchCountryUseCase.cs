@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
-using Domain.Repositories;
+using Domain.Entities;
 
 namespace Domain.UseCases.CountriesSearch
 {
-    public class SearchCountryByNameUseCase
+    public abstract class SearchCountryUseCase
     {
-        private readonly ICountryRepository _countryRepository;
-
-        public IEnumerable<CountrySearchOutput> Execute(string name)
+        public abstract IEnumerable<CountrySearchOutput> Execute(string name);
+        
+        protected IEnumerable<CountrySearchOutput> CreateCountriesSearchOutputs(IEnumerable<Country> countries)
         {
-            var countries = _countryRepository.GetByName(name);
-
             if (countries == null)
                 return null;
 
