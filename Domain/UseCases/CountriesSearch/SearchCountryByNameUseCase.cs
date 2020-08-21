@@ -1,21 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Domain.Repositories;
 
 namespace Domain.UseCases.CountriesSearch
 {
     public sealed class SearchCountryByNameUseCase : SearchCountryUseCase
     {
-        private readonly ICountryRepository _countryRepository;
+        private readonly ILocalCountryRepository _localCountryRepository;
+        private readonly IRemoteCountryRepository _remoteCountryRepository;
 
-        public SearchCountryByNameUseCase(ICountryRepository countryRepository)
+        public SearchCountryByNameUseCase(ILocalCountryRepository localCountryRepository, IRemoteCountryRepository remoteCountryRepository)
         {
-            _countryRepository = countryRepository ?? throw new ArgumentNullException(nameof(countryRepository));
+            _localCountryRepository = localCountryRepository ?? throw new ArgumentNullException(nameof(localCountryRepository));
+            _remoteCountryRepository = remoteCountryRepository ?? throw new ArgumentNullException(nameof(remoteCountryRepository));
         }
 
-        public override IEnumerable<CountrySearchOutput> Execute(string input)
+        public override async Task<IEnumerable<CountrySearchOutput>> ExecuteAsync(string input)
         {
-            var countries = _countryRepository.GetByName(input);
+            var countries = _localCountryRepository.GetByName(input);
+
+            if (HasCountries(countries) == false)
+            {
+                countries = await _remoteCountryRepository.GetByNameAsync(input);
+                _ = _localCountryRepository.SaveAsync(countries);
+            }
+
             var countriesOutput = CreateCountriesSearchOutputs(countries);
 
             return countriesOutput;
