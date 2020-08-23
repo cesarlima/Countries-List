@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Domain.Repositories;
 
 namespace Domain.UseCases.CountriesSearch
 {
     public sealed class SearchCountryByCurrencyCodeUseCase : SearchCountryUseCase
     {
-        private readonly ICountryRepository _countryRepository;
+        public SearchCountryByCurrencyCodeUseCase(ILocalCountryRepository localCountryRepository, IRemoteCountryRepository remoteCountryRepository) :
+            base(localCountryRepository, remoteCountryRepository)
+        { }
 
-        public SearchCountryByCurrencyCodeUseCase(ICountryRepository countryRepository)
+        public override async Task<IEnumerable<CountrySearchOutput>> ExecuteAsync(string input)
         {
-            _countryRepository = countryRepository ?? throw new ArgumentNullException(nameof(countryRepository));
-        }
+            var countries = _localCountryRepository.GetBySearchedWord(input, Entities.SearchType.Currency);
 
-        public override IEnumerable<CountrySearchOutput> Execute(string input)
-        {
-            var countries = _countryRepository.GetByCurrencyCode(input);
+            if (HasCountries(countries) == false)
+            {
+                countries = await _remoteCountryRepository.GetByCurrencyCodeAsync(input);
+                await _localCountryRepository.SaveAsync(countries, input, Entities.SearchType.Currency);
+            }
+
             var countriesOutput = CreateCountriesSearchOutputs(countries);
 
             return countriesOutput;

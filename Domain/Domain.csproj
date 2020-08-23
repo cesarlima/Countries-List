@@ -15,5 +15,6 @@
     <Folder Include="UseCases\" />
     <Folder Include="Repositories\" />
     <Folder Include="UseCases\CountriesSearch\" />
+    <Folder Include="UseCases\CountrySearch\" />
   </ItemGroup>
 </Project>

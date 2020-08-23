@@ -3,33 +3,42 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Repositories;
+using System.Linq;
 
 namespace Infra.Local
 {
     public class LocalCountryRepository : ILocalCountryRepository
     {
-        public LocalCountryRepository()
+        private readonly CountryContextFake _context;
+
+        public LocalCountryRepository(CountryContextFake context)
         {
+            _context = context;
         }
 
-        public IEnumerable<Country> GetByAlpha3Code(string alphaCode)
+        public Task<Country> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_context.Countries.FirstOrDefault(c => c.Id == id));
         }
 
-        public IEnumerable<Country> GetByCurrencyCode(string currencyCode)
+        public IEnumerable<Country> GetBySearchedWord(string searchedWord, SearchType searchType)
         {
-            throw new NotImplementedException();
+            var key = $"{searchedWord}-{searchType}";
+            return _context.CountrySearchies.ContainsKey(key) ? _context.CountrySearchies[key] : null;
         }
 
-        public IEnumerable<Country> GetByName(string name)
+        public async Task SaveAsync(IEnumerable<Country> countries, string searchedWord, SearchType searchType)
         {
-            return null;
-        }
+            var key = $"{searchedWord}-{searchType}";
 
-        public Task SaveAsync(IEnumerable<Country> countries)
-        {
-            throw new NotImplementedException();
+            if (_context.CountrySearchies.ContainsKey(key))
+                _context.CountrySearchies[key] = countries;
+            else
+                _context.CountrySearchies.Add(key, countries);
+
+            _context.Countries.AddRange(countries);
+
+            await Task.CompletedTask;
         }
     }
 }

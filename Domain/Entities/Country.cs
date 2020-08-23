@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Domain.Entities
 {
     public class Country
     {
+        public Guid Id { get; private set; }
         public string Name { get; set; }
         public string Alpha3Code { get; set; }
         public string Capital { get; set; }
@@ -15,6 +17,11 @@ namespace Domain.Entities
         public List<RegionalBloc> RegionalBlocs { get; set; }
         public List<Currency> Currencies { get; set; }
         public List<Language> Languages { get; set; }
+
+        public Country()
+        {
+            Id = Guid.NewGuid();
+        }
 
 
         public IEnumerable<string> GetCurrenciesCodes()

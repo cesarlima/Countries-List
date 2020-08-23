@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Entities;
 
@@ -6,9 +7,8 @@ namespace Domain.Repositories
 {
     public interface ILocalCountryRepository
     {
-        IEnumerable<Country> GetByName(string name);
-        IEnumerable<Country> GetByAlpha3Code(string alphaCode);
-        IEnumerable<Country> GetByCurrencyCode(string currencyCode);
-        Task SaveAsync(IEnumerable<Country> countries);
+        Task<Country> GetByIdAsync(Guid id);
+        IEnumerable<Country> GetBySearchedWord(string searchedWord, SearchType searchType);
+        Task SaveAsync(IEnumerable<Country> countries, string searchedWord, SearchType searchType);
     }
 }

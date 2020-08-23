@@ -14,7 +14,6 @@ namespace Infra.Remote
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        private readonly string _baseURL;
 
         public RemoteCountryRepository(HttpClient httpClient, IConfiguration configuration)
         {
@@ -26,20 +25,30 @@ namespace Infra.Remote
                 new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public Task<IEnumerable<Country>> GetByAlpha3CodeAsync(string alphaCode)
+        public async Task<IEnumerable<Country>> GetByAlpha3CodeAsync(string alphaCode)
         {
-            throw new NotImplementedException();
+            var endpontURL = _configuration.GetSection("Restcountries_URLs:AlphaCode").Value;
+            var countries = await GetCountries($"{endpontURL}/{alphaCode}");
+            return countries;
         }
 
-        public Task<IEnumerable<Country>> GetByCurrencyCodeAsync(string currencyCode)
+        public async Task<IEnumerable<Country>> GetByCurrencyCodeAsync(string currencyCode)
         {
-            throw new NotImplementedException();
+            var endpontURL = _configuration.GetSection("Restcountries_URLs:Currency").Value;
+            var countries = await GetCountries($"{endpontURL}/{currencyCode}");
+            return countries;
         }
 
         public async Task<IEnumerable<Country>> GetByNameAsync(string name)
         {
             var endpontURL = _configuration.GetSection("Restcountries_URLs:Name").Value;
-            var response = await _httpClient.GetAsync($"{endpontURL}/{name}");
+            var countries = await GetCountries($"{endpontURL}/{name}");
+            return countries;
+        }
+
+        private async Task<IEnumerable<Country>> GetCountries(string url)
+        {
+            var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
